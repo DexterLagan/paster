@@ -2,7 +2,7 @@
 
 Quickly paste items into the clipboard from an easy to resize panel.<br>
 Add an item from the clipboard using the '+' button.<br>
-Remove items by right-clicking on them.<br>
+Remove an item by right-clicking on it.<br>
 
 <p align="center"><img src="screenshots/mainwindow.png"></p>
 
