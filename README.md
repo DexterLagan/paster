@@ -14,7 +14,7 @@ Remove an item by right-clicking on it.<br>
 ## Downloads
 You can <b>download</b> the latest release for <b>Windows</b> as a portable, standalone executable [HERE](https://github.com/DexterLagan/paster/releases).
 
-## Optionnal Configuration 
+## Optional Configuration 
 
 A config file (paster.conf) can optionally be provided, and paster will create buttons for each string in it. Passwords can be partially hidden if their config line starts with "* ".
 
