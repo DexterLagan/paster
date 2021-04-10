@@ -20,9 +20,9 @@ A config file (**paster.conf**) can optionally be provided, and paster will crea
 
 Example:
 <pre>
-* my-email-pass
+* some-secret-text
 some other item
 more items
-* some-other-sensitive-text
+* some other secret
 more regular clips
 </pre>
