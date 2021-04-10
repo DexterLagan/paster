@@ -16,7 +16,7 @@ You can <b>download</b> the latest release for <b>Windows</b> as a portable, sta
 
 ## Optional Configuration 
 
-A config file (paster.conf) can optionally be provided, and paster will create buttons for each string in it. Passwords can be partially hidden if their config line starts with "* ".
+A config file (**paster.conf**) can optionally be provided, and paster will create buttons for each string in it. Passwords can be partially hidden if their config line starts with "* ".
 
 Example:
 <pre>
