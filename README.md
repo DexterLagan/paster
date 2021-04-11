@@ -9,7 +9,7 @@ Remove an item by right-clicking on it.<br>
 ## Version History
 
 * v1.1 - adds support for reading the initial clips off an optional configuration file;<br>
-       - adds support for remembering window position between sessions (Windows only).
+           - adds support for remembering window position between sessions (Windows only).
 * v1.0 - initial release.
 
 ## Downloads
