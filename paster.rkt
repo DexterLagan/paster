@@ -1,4 +1,5 @@
 #lang racket/gui
+(require file/resource)
 (module+ test
   (require rackunit))
 
@@ -20,6 +21,7 @@
 ;;; consts
 
 (define *version* "1.1")
+(define *app-maker* "Gluten Free Software")
 (define *app-name*
   (string-append "Paster v" *version*))
 (define *min-button-size* 220)
@@ -50,9 +52,12 @@
 
 ;; generates a small frame to fill with controls
 ;; traps mouse click events and quits cleanly
-(define (make-elastic-frame appname)
+(define (make-elastic-frame appname x-pos y-pos)
   (new (class frame% (super-new)
          (define/augment (on-close)
+           (set-saved-window-pos *app-maker* *app-name*
+                                 (send main-frame get-x)
+                                 (send main-frame get-y))
            (exit 0))
          (define/override (on-subwindow-event r e)
            (define control-label (send r get-label))
@@ -63,6 +68,8 @@
                    (set! button-list (remove r button-list))))
                #f)))
        [label appname]
+       [x x-pos]
+       [y y-pos]
        [width 0]
        [height 0]
        [stretchable-width 1024]
@@ -101,23 +108,6 @@
     (set! button-list
           (cons new-button button-list))))
 
-;;; main
-
-;; create a resizable frame for our buttons
-(set! main-frame
-      (make-elastic-frame *app-name*))
-
-;; load config file if it exists
-(when (and (file-exists? *default-config-file*)
-           (non-empty-string? (file->string *default-config-file*)))
-  (define lines (file->lines *default-config-file*))
-  (when (cons? lines)
-    (map (λ (l)
-           (if (string-prefix? l "* ")
-               (add-a-button (string-replace l "* " "") #t)
-               (add-a-button l #f))) (reverse lines)))
-  (reorder-buttons))
-
 ;; defines what happens when one clicks on a paste button:
 ;; sets the clipboard with the button's content.
 (define (paste-button-callback clip)
@@ -129,7 +119,33 @@
   (add-a-button (get-clipboard-text) #f)
   (reorder-buttons))
 
-;; add a '+' button to the window
+;; load x and y window position from the registry. Returns #f if not available
+(define (get-saved-window-pos app-maker app-name)
+  (values (string->number
+           (get-resource "HKEY_CURRENT_USER"
+                         "\\Software\\Gluten Free Software\\Paster\\x-pos"))
+          (string->number
+           (get-resource "HKEY_CURRENT_USER"
+                         "\\Software\\Gluten Free Software\\Paster\\y-pos"))))
+
+;; save x and y window position to the registry on Windows only
+(define (set-saved-window-pos app-maker app-name x-pos y-pos)
+  (values (write-resource "HKEY_CURRENT_USER"
+                          "\\Software\\Gluten Free Software\\Paster\\x-pos" x-pos)
+          (write-resource "HKEY_CURRENT_USER"
+                          "\\Software\\Gluten Free Software\\Paster\\y-pos" y-pos)))
+
+;;; main
+
+; load window position from the registry, on Windows only
+(define-values (x-pos y-pos)
+  (get-saved-window-pos *app-maker* *app-name*))
+
+; create a resizable frame for our buttons
+(set! main-frame
+      (make-elastic-frame *app-name* x-pos y-pos))
+
+; add a '+' button to the window
 (define add-button
   (new button%
        [label "+"]
@@ -141,11 +157,22 @@
        [font (make-object font% *default-font-size* 'swiss 'normal 'bold)]
        [callback (λ (b e) (add-button-callback))]))
 
-;; initialize button list with the add button alone
+; load config file if it exists
+(when (and (file-exists? *default-config-file*)
+           (non-empty-string? (file->string *default-config-file*)))
+  (define lines (file->lines *default-config-file*))
+  (when (cons? lines)
+    (map (λ (l)
+           (if (string-prefix? l "* ")
+               (add-a-button (string-replace l "* " "") #t)
+               (add-a-button l #f))) (reverse lines)))
+  (reorder-buttons))
+
+; initialize button list with the add button alone
 (set! button-list
       (append button-list (list add-button)))
 
-;; display the window
+; display the window
 (send main-frame show #t)
 
 
