@@ -34,11 +34,6 @@
 (define main-frame #f)
 (define button-list '())
 
-;; quick and dirty printer
-(define echo
-  (λ args
-    (displayln (apply ~a args))))
-
 ;; returns the clipboard's contents as string
 (define (get-clipboard-text)
   (send the-clipboard get-clipboard-string 0))
@@ -53,12 +48,6 @@
       #t
       #f))
 
-;; displays an error and quits
-(define die
-  (λ args
-    (void (message-box *app-name* (string-append (apply ~a args) "  ") #f (list 'stop)))
-    (exit 1)))
-
 ;; generates a small frame to fill with controls
 ;; traps mouse click events and quits cleanly
 (define (make-elastic-frame appname)
@@ -69,8 +58,9 @@
            (define control-label (send r get-label))
            (if (send e button-up? 'right)
                (unless (string=? control-label "+")
-                 (send main-frame delete-child r)
-                 (set! button-list (remove r button-list)))
+                 (when (show-confirmation-dialog "Delete clip?")
+                   (send main-frame delete-child r)
+                   (set! button-list (remove r button-list))))
                #f)))
        [label appname]
        [width 0]
@@ -82,11 +72,6 @@
 (define (reorder-buttons)
   (send main-frame change-children
         (λ (children) button-list)))
-
-;; displays button list for debugging
-(define (display-button-list)
-  (echo (map (λ (o) (string-append "'" (send o get-label) "'"))
-             button-list)))
 
 ;; adds a button given a string used as both clipping and title
 ;; optionally hides secret text behind stars
