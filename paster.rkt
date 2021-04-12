@@ -22,8 +22,7 @@
 
 (define *version* "1.1")
 (define *app-maker* "Gluten Free Software")
-(define *app-name*
-  (string-append "Paster v" *version*))
+(define *app-name* "Paster")
 (define *min-button-size* 220)
 (define *max-button-size* 1024)
 (define *max-title-length* 64)
@@ -123,17 +122,17 @@
 (define (get-saved-window-pos app-maker app-name)
   (values (string->number
            (get-resource "HKEY_CURRENT_USER"
-                         "\\Software\\Gluten Free Software\\Paster\\x-pos"))
+                         (string-append "\\Software\\" app-maker "\\" app-name "\\x-pos")))
           (string->number
            (get-resource "HKEY_CURRENT_USER"
-                         "\\Software\\Gluten Free Software\\Paster\\y-pos"))))
+                         (string-append "\\Software\\" app-maker "\\" app-name "\\y-pos")))))
 
 ;; save x and y window position to the registry on Windows only
 (define (set-saved-window-pos app-maker app-name x-pos y-pos)
   (values (write-resource "HKEY_CURRENT_USER"
-                          "\\Software\\Gluten Free Software\\Paster\\x-pos" x-pos)
+                          (string-append "\\Software\\" app-maker "\\" app-name "\\x-pos") x-pos)
           (write-resource "HKEY_CURRENT_USER"
-                          "\\Software\\Gluten Free Software\\Paster\\y-pos" y-pos)))
+                          (string-append "\\Software\\" app-maker "\\" app-name "\\y-pos") y-pos)))
 
 ;;; main
 
