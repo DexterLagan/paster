@@ -120,19 +120,21 @@
 
 ;; load x and y window position from the registry. Returns #f if not available
 (define (get-saved-window-pos app-maker app-name)
-  (values (string->number
-           (get-resource "HKEY_CURRENT_USER"
-                         (string-append "\\Software\\" app-maker "\\" app-name "\\x-pos")))
-          (string->number
-           (get-resource "HKEY_CURRENT_USER"
-                         (string-append "\\Software\\" app-maker "\\" app-name "\\y-pos")))))
+  (values (get-resource "HKEY_CURRENT_USER"
+                        (string-append "Software\\" app-maker "\\" app-name "\\x-pos")
+                        #f #f #:type 'integer)
+          (get-resource "HKEY_CURRENT_USER"
+                        (string-append "Software\\" app-maker "\\" app-name "\\y-pos")
+                        #f #f #:type 'integer)))
 
 ;; save x and y window position to the registry on Windows only
 (define (set-saved-window-pos app-maker app-name x-pos y-pos)
   (values (write-resource "HKEY_CURRENT_USER"
-                          (string-append "\\Software\\" app-maker "\\" app-name "\\x-pos") x-pos)
+                          (string-append "Software\\" app-maker "\\" app-name "\\x-pos")
+                          x-pos #f #:type 'dword #:create-key? #t)
           (write-resource "HKEY_CURRENT_USER"
-                          (string-append "\\Software\\" app-maker "\\" app-name "\\y-pos") y-pos)))
+                          (string-append "Software\\" app-maker "\\" app-name "\\y-pos")
+                          y-pos #f #:type 'dword #:create-key? #t)))
 
 ;;; main
 
