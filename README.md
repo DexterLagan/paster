@@ -13,7 +13,7 @@ Remove an item by right-clicking on it.<br>
 * v1.0 - initial release.
 
 ## Downloads
-You can <b>download</b> the latest release for <b>Windows</b> as a portable, standalone executable [HERE](https://github.com/DexterLagan/paster/releases).
+You can <b>download</b> the latest release for <b>Windows</b> 32 and 64 bits as a portable, standalone executable [HERE](https://github.com/DexterLagan/paster/releases).
 
 ## Optional Configuration 
 
