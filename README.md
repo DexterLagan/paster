@@ -1,6 +1,7 @@
 # Paster
 
 Quickly paste items into the clipboard from an easy to resize panel.<br>
+Execute arbitrary shell commands or open URLs through easy configuration switches.<br>
 Add an item from the clipboard using the '+' button.<br>
 Remove an item by right-clicking on it.<br>
 
