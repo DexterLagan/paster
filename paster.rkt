@@ -11,21 +11,23 @@
 ;;; configuration
 
 ; a config file (paster.conf) can optionally be provided, and paster will create buttons for each string in it.
-; passwords can be partially hidden if their config line starts with "* ".
+; secrets can be partially hidden if their config line starts with '* '.
+; arbitrary shell commands can be launched if specified by config lines starting with '! '.
 
 ;;; version history
 
-; v1.1 - added support for reading the initial clips off an optional configuration file.
+; v1.2 - added support for executing arbitrary shell commands through the '! ' config prefix;
+; v1.1 - added support for reading the initial clips off an optional configuration file;
 ; v1.0 - initial release.
 
 ;;; consts
 
-(define *version* "1.1")
+(define *version* "1.2")
 (define *app-maker* "Gluten Free Software")
 (define *app-name* "Paster")
 (define *min-button-size* 220)
 (define *max-button-size* 1024)
-(define *max-title-length* 64)
+(define *max-title-length* 32)
 (define *default-font-size* 10)
 (define *default-config-file* "paster.conf")
 
@@ -81,7 +83,7 @@
 
 ;; adds a button given a string used as both clipping and title
 ;; optionally hides secret text behind stars
-(define (add-a-button str password?)
+(define (add-a-button str type)
   (when (non-empty-string? str)
     (define title-len
       (if (< (string-length str) *max-title-length*)
@@ -89,11 +91,12 @@
           *max-title-length*))
     (define button-title
       ; if the clip is a password, hide the middle of it behind stars
-      (if password?
-          (string-append (substring str 0 1)
-                         (make-string (- title-len 2) #\*)
-                         (substring str (- title-len 1) title-len))
-          (substring str 0 title-len)))
+      (case type
+        ((secret) (string-append (substring str 0 1)
+                                 (make-string (- title-len 2) #\*)
+                                 (substring str (- title-len 1) title-len)))
+        ((shell) (string-replace (substring str 0 title-len) "! " ""))
+        (else (substring str 0 title-len)))) ; also 'paste
     (define new-button
       (new button%
            [label button-title]
@@ -110,12 +113,14 @@
 ;; defines what happens when one clicks on a paste button:
 ;; sets the clipboard with the button's content.
 (define (paste-button-callback clip)
-  (set-clipboard-text clip))
+  (if (string-prefix? clip "! ") ; if this is a shell command, run it:
+      (shell-execute #f (string-replace clip "! " "") "" (current-directory) 'sw_shownormal)
+      (set-clipboard-text clip))) ; else paste to clipboard.
 
 ;; defines what happens when one clicks on the '+' button:
 ;; reads the clipboard, if non-empty grab a portion of it as title for a new button.
 (define (add-button-callback)
-  (add-a-button (get-clipboard-text) #f)
+  (add-a-button (get-clipboard-text) 'paste)
   (reorder-buttons))
 
 ;; load x and y window position from the registry. Returns #f if not available
@@ -161,12 +166,14 @@
 ; load config file if it exists
 (when (and (file-exists? *default-config-file*)
            (non-empty-string? (file->string *default-config-file*)))
-  (define lines (file->lines *default-config-file*))
+  (define lines
+    (file->lines *default-config-file*))
   (when (cons? lines)
     (map (λ (l)
-           (if (string-prefix? l "* ")
-               (add-a-button (string-replace l "* " "") #t)
-               (add-a-button l #f))) (reverse lines)))
+           (cond ((string-prefix? l "* ") (add-a-button (string-replace l "* " "") 'secret))
+                 ((string-prefix? l "! ") (add-a-button l 'shell))
+                 (else (add-a-button l 'paste))))
+         (reverse lines)))
   (reorder-buttons))
 
 ; initialize button list with the add button alone
