@@ -163,6 +163,10 @@
        [font (make-object font% *default-font-size* 'swiss 'normal 'bold)]
        [callback (λ (b e) (add-button-callback))]))
 
+; initialize button list with the add button
+(set! button-list
+      (append button-list (list add-button)))
+
 ; load config file if it exists
 (when (and (file-exists? *default-config-file*)
            (non-empty-string? (file->string *default-config-file*)))
@@ -173,12 +177,8 @@
            (cond ((string-prefix? l "* ") (add-a-button (string-replace l "* " "") 'secret))
                  ((string-prefix? l "! ") (add-a-button l 'shell))
                  (else (add-a-button l 'paste))))
-         (reverse lines)))
-  (reorder-buttons))
-
-; initialize button list with the add button alone
-(set! button-list
-      (append button-list (list add-button)))
+         (reverse lines))
+    (reorder-buttons)))
 
 ; display the window
 (send main-frame show #t)
