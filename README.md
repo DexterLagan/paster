@@ -36,4 +36,4 @@ more regular clips
 
 ## License
 
-NewIDE is free software; see [LICENSE](https://github.com/DexterLagan/paster/blob/main/LICENSE) for more details.
+Paster is free software; see [LICENSE](https://github.com/DexterLagan/paster/blob/main/LICENSE) for more details.
